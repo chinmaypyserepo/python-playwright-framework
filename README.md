@@ -38,50 +38,67 @@ scripts\run-tests.bat webkit smoke
 
 ## Day-to-day commands
 
-Windows runs headless by default:
+### Run tests on Windows
 
 ```bat
+# Headed Chromium smoke tests
 scripts\run-tests.bat chromium smoke
+
+# Headless Chromium smoke tests
+scripts\run-tests.bat chromium smoke headless
+
+# Headed Firefox/WebKit smoke tests
+scripts\run-tests.bat firefox smoke
+scripts\run-tests.bat webkit smoke
+
+# All tests, headed
+scripts\run-tests.bat chromium all
+
+# All tests, headless
+scripts\run-tests.bat chromium all headless
 ```
 
-To run headed, use this command:
+Available markers are `smoke`, `ui`, `api`, or `all`.
+
+### Allure report
 
 ```bat
-set HEADLESS=false
-python -m pytest -m smoke --browser chromium
+# Generate results (the test runner already does this)
+scripts\run-tests.bat chromium smoke headed
+
+# Open the report
+allure serve allure-results
 ```
 
-Direct Pytest commands:
+### Git commands
 
 ```bat
-# Headless, all tests
-set HEADLESS=true
-python -m pytest --browser chromium --alluredir allure-results
+# Check current branch and changes
+git status
+git branch
 
-# Headed, one test file
-set HEADLESS=false
-python -m pytest tests/test_ui_home.py --browser chromium -s
+# Get latest GitHub changes
+git pull origin main
 
-# Run by marker
-python -m pytest -m ui --browser chromium
-python -m pytest -m api --browser chromium
+# See changed files
+git diff
 
-# Run one test by name
-python -m pytest -k "contact_form_submission" --browser chromium -s
+# Save changes
+git add .
+git commit -m "Describe your change"
 
-# Run Firefox or WebKit
-python -m pytest -m smoke --browser firefox
-python -m pytest -m smoke --browser webkit
+# Upload to GitHub
+git push origin main
 
-# Run in parallel (use isolated test data for write-heavy suites)
-python -m pytest -m smoke --browser chromium -n 2
+# View recent commits
+git log --oneline -10
 ```
 
 Useful diagnostics:
 
-```text
+```bat
 # Show collection without executing tests
-python -m pytest --collect-only -q
+scripts\run-tests.bat chromium smoke headed
 
 # Open the latest Allure report
 allure serve allure-results
@@ -90,8 +107,8 @@ allure serve allure-results
 playwright show-trace test-results/traces/<test-name>.zip
 
 # Remove generated local results
-rmdir /s /q test-results
-rmdir /s /q allure-results
+rmdir /s /q test-results 2>nul
+rmdir /s /q allure-results 2>nul
 ```
 
 On Linux/macOS, use the equivalent runner:
