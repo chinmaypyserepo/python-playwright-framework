@@ -23,6 +23,14 @@ def test_contact_form_submission(page, test_data):
 
 
 @pytest.mark.ui
+@allure.title("Runtime data is captured and used in the contact form")
+def test_runtime_contact_data_submission(page, runtime_contact_data):
+    page.goto(settings.base_url, wait_until="domcontentloaded")
+    HomePage(page).submit_contact_form(**runtime_contact_data)
+    expect(page.locator("body")).to_contain_text("Thanks for getting in touch", timeout=10000)
+
+
+@pytest.mark.ui
 @allure.title("Guest can navigate the availability date picker")
 def test_availability_date_picker_supports_month_navigation(page):
     page.goto(settings.base_url, wait_until="domcontentloaded")

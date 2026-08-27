@@ -5,6 +5,7 @@ An interview-ready example framework for [automationintesting.online](https://au
 ## Architecture
 
 ```text
+conftest.py             shared fixtures and Allure/browser evidence
 config/                 typed .env-backed settings
 test_framework/         API client, retry, logging, SQLite persistence
 pages/                  Page Object Model

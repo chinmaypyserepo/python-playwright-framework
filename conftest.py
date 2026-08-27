@@ -1,7 +1,9 @@
 import json
 import logging
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from uuid import uuid4
 
 import allure
 import pytest
@@ -12,7 +14,7 @@ from test_framework.database import TestRunRepository
 from test_framework.logging_config import configure_logging
 
 logger = logging.getLogger(__name__)
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parent
 
 
 def pytest_configure() -> None:
@@ -29,6 +31,23 @@ def test_data() -> dict[str, Any]:
 def rooms_data() -> dict[str, Any]:
     with (ROOT / "data" / "rooms.json").open(encoding="utf-8") as file:
         return json.load(file)
+
+
+@pytest.fixture
+def runtime_contact_data() -> dict[str, str]:
+    runtime_data = {
+        "name": "Runtime Playwright Test",
+        "email": f"playwright-{uuid4().hex[:8]}@example.com",
+        "phone": "01234567890",
+        "subject": f"Runtime capture {datetime.now(timezone.utc):%Y%m%d%H%M%S}",
+        "message": "Captured during the test run and used in the contact form.",
+    }
+    allure.attach(
+        json.dumps(runtime_data, indent=2),
+        name="runtime-contact-data.json",
+        attachment_type=allure.attachment_type.JSON,
+    )
+    return runtime_data
 
 
 @pytest.fixture(scope="session")
@@ -48,11 +67,10 @@ def context(browser: Browser) -> BrowserContext:
 def page(context: BrowserContext, request: pytest.FixtureRequest) -> Page:
     context.tracing.start(screenshots=True, snapshots=True, sources=True)
     current_page = context.new_page()
-    video = current_page.video
     current_page.set_default_timeout(settings.action_timeout_ms)
     current_page.set_default_navigation_timeout(settings.navigation_timeout_ms)
     yield current_page
-    report = getattr(request.node, "rep_call", None)
+
     screenshot = current_page.screenshot(full_page=True)
     allure.attach(screenshot, "screenshot.png", allure.attachment_type.PNG)
     trace_path = ROOT / "test-results" / "traces" / f"{request.node.name}.zip"
@@ -61,8 +79,12 @@ def page(context: BrowserContext, request: pytest.FixtureRequest) -> Page:
     allure.attach.file(str(trace_path), name="trace.zip", attachment_type=allure.attachment_type.ZIP)
     current_page.close()
     context.close()
-    if video:
-        allure.attach.file(video.path(), name="video.webm", attachment_type=allure.attachment_type.WEBM)
+    if current_page.video:
+        allure.attach.file(
+            current_page.video.path(),
+            name="video.webm",
+            attachment_type=allure.attachment_type.WEBM,
+        )
 
 
 @pytest.hookimpl(hookwrapper=True)
