@@ -1,5 +1,6 @@
 import json
 import logging
+import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -19,6 +20,11 @@ ROOT = Path(__file__).resolve().parent
 
 def pytest_configure() -> None:
     configure_logging()
+
+
+def pytest_sessionstart(session: pytest.Session) -> None:
+    for artifact_dir in ("allure-results", "test-results"):
+        shutil.rmtree(ROOT / artifact_dir, ignore_errors=True)
 
 
 @pytest.fixture(scope="session")
