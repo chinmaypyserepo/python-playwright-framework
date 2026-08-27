@@ -25,89 +25,71 @@ copy .env.example .env
 playwright install
 ```
 
-Run smoke tests:
+## Run tests (Windows)
+
+Headed mode is the default:
 
 ```bat
-scripts\run-tests.bat chromium smoke
-scripts\run-tests.bat firefox smoke
-scripts\run-tests.bat webkit smoke
+python -m pytest -m smoke --browser chromium --alluredir allure-results
 ```
 
-```bash
-./scripts/run-tests.sh chromium smoke
-```
-
-## Day-to-day commands
-
-Windows runs headless by default:
+Headless mode:
 
 ```bat
-scripts\run-tests.bat chromium smoke
+python -m pytest -m smoke --browser chromium --headless --alluredir allure-results
 ```
 
-To run headed, use this command:
+Run by marker:
 
 ```bat
-set HEADLESS=false
+python -m pytest -m ui --browser chromium
+python -m pytest -m api --browser chromium
 python -m pytest -m smoke --browser chromium
 ```
 
-Direct Pytest commands:
-
-```bat
-# Headless, all tests
-set HEADLESS=true
-python -m pytest --browser chromium --alluredir allure-results
-
-# Headed, one test file
-set HEADLESS=false
-python -m pytest tests/test_ui_home.py --browser chromium -s
-
-# Run by marker
-python -m pytest -m ui --browser chromium
-python -m pytest -m api --browser chromium
-
-# Run one test by name
-python -m pytest -k "contact_form_submission" --browser chromium -s
-
-# Run Firefox or WebKit
-python -m pytest -m smoke --browser firefox
-python -m pytest -m smoke --browser webkit
-
-# Run in parallel (use isolated test data for write-heavy suites)
-python -m pytest -m smoke --browser chromium -n 2
-```
-
-Useful diagnostics:
-
-```text
-# Show collection without executing tests
-python -m pytest --collect-only -q
-
-# Open the latest Allure report
-allure serve allure-results
-
-# Inspect a failed Playwright trace
-playwright show-trace test-results/traces/<test-name>.zip
-
-# Remove generated local results
-rmdir /s /q test-results
-rmdir /s /q allure-results
-```
-
-On Linux/macOS, use the equivalent runner:
-
-```bash
-./scripts/run-tests.sh chromium smoke                 # headless
-HEADLESS=false ./scripts/run-tests.sh chromium smoke # headed
-python -m pytest -m ui --browser chromium -s
-```
-
-Run all tests and generate an Allure report:
+Run all normal tests:
 
 ```bat
 python -m pytest --browser chromium --alluredir allure-results
+```
+
+Run the intentional failure:
+
+```bat
+python -m pytest -m intentional_failure --browser chromium --headless --alluredir allure-results
+```
+
+Run one test:
+
+```bat
+python -m pytest tests/test_ui_home.py::test_runtime_contact_data_submission --browser chromium
+```
+
+Run Firefox or WebKit headlessly:
+
+```bat
+python -m pytest -m smoke --browser firefox --headless
+python -m pytest -m smoke --browser webkit --headless
+```
+
+## Allure and artifacts
+
+Every UI test creates a screenshot, video, and trace. Old artifacts are removed at the start of each run.
+
+```bat
 allure serve allure-results
+playwright show-trace test-results\traces\<test-name>.zip
+```
+
+## Git
+
+```bat
+git status
+git pull origin main
+git add .
+git commit -m "Describe your change"
+git push origin main
+git log --oneline -10
 ```
 
 Failures produce a full-page screenshot, Playwright trace ZIP, video, log file, and SQLite row under `test-results/`. Open a trace with `playwright show-trace test-results/traces/<test>.zip`.

@@ -22,6 +22,15 @@ def pytest_configure() -> None:
     configure_logging()
 
 
+def pytest_addoption(parser: pytest.Parser) -> None:
+    parser.addoption(
+        "--headless",
+        action="store_true",
+        default=False,
+        help="Run the browser without displaying a window.",
+    )
+
+
 def pytest_sessionstart(session: pytest.Session) -> None:
     for artifact_dir in ("allure-results", "test-results"):
         shutil.rmtree(ROOT / artifact_dir, ignore_errors=True)
@@ -83,11 +92,12 @@ def page(context: BrowserContext, request: pytest.FixtureRequest) -> Page:
     trace_path.parent.mkdir(parents=True, exist_ok=True)
     context.tracing.stop(path=str(trace_path))
     allure.attach.file(str(trace_path), name="trace.zip", attachment_type=allure.attachment_type.ZIP)
+    video = current_page.video
     current_page.close()
     context.close()
-    if current_page.video:
+    if video:
         allure.attach.file(
-            current_page.video.path(),
+            video.path(),
             name="video.webm",
             attachment_type=allure.attachment_type.WEBM,
         )
@@ -106,5 +116,8 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[Any]):
 
 
 @pytest.fixture(scope="session")
-def browser_type_launch_args() -> dict[str, Any]:
-    return {"headless": settings.headless, "slow_mo": settings.slow_mo}
+def browser_type_launch_args(request: pytest.FixtureRequest) -> dict[str, Any]:
+    return {
+        "headless": request.config.getoption("--headless") or settings.headless,
+        "slow_mo": settings.slow_mo,
+    }
