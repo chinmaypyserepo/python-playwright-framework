@@ -41,3 +41,26 @@ def test_contact_form_validation(page):
     page.goto(settings.base_url, wait_until="domcontentloaded")
     HomePage(page).submit_button.click()
     expect(page.locator("body")).to_contain_text("Email may not be blank", timeout=10000)
+
+
+@pytest.mark.ui
+@allure.title("Contact form exposes all required fields")
+def test_contact_form_fields_are_visible(page):
+    page.goto(settings.base_url, wait_until="domcontentloaded")
+    for field in ("#name", "#email", "#phone", "#subject", "#description"):
+        expect(page.locator(field)).to_be_visible()
+
+
+@pytest.mark.ui
+@allure.title("Availability form is visible")
+def test_availability_form_is_visible(page):
+    page.goto(settings.base_url, wait_until="domcontentloaded")
+    expect(page.get_by_role("button", name="Check Availability")).to_be_visible()
+
+
+@pytest.mark.ui
+@allure.title("Intentional failure reporting scenario")
+@pytest.mark.intentional_failure
+def test_intentional_failure_reporting(page):
+    page.goto(settings.base_url, wait_until="domcontentloaded")
+    assert page.title() == "Intentional failure requested"

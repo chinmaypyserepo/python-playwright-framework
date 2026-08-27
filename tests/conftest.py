@@ -8,8 +8,8 @@ import pytest
 from playwright.sync_api import Browser, BrowserContext, Page
 
 from config.settings import settings
-from framework.database import TestRunRepository
-from framework.logging_config import configure_logging
+from test_framework.database import TestRunRepository
+from test_framework.logging_config import configure_logging
 
 logger = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
@@ -48,20 +48,21 @@ def context(browser: Browser) -> BrowserContext:
 def page(context: BrowserContext, request: pytest.FixtureRequest) -> Page:
     context.tracing.start(screenshots=True, snapshots=True, sources=True)
     current_page = context.new_page()
+    video = current_page.video
     current_page.set_default_timeout(settings.action_timeout_ms)
     current_page.set_default_navigation_timeout(settings.navigation_timeout_ms)
     yield current_page
     report = getattr(request.node, "rep_call", None)
-    if report and report.failed:
-        screenshot = current_page.screenshot(full_page=True)
-        allure.attach(screenshot, "failure.png", allure.attachment_type.PNG)
-        trace_path = ROOT / "test-results" / "traces" / f"{request.node.name}.zip"
-        trace_path.parent.mkdir(parents=True, exist_ok=True)
-        context.tracing.stop(path=str(trace_path))
-        allure.attach.file(str(trace_path), name="trace.zip", attachment_type=allure.attachment_type.ZIP)
-    else:
-        context.tracing.stop()
+    screenshot = current_page.screenshot(full_page=True)
+    allure.attach(screenshot, "screenshot.png", allure.attachment_type.PNG)
+    trace_path = ROOT / "test-results" / "traces" / f"{request.node.name}.zip"
+    trace_path.parent.mkdir(parents=True, exist_ok=True)
+    context.tracing.stop(path=str(trace_path))
+    allure.attach.file(str(trace_path), name="trace.zip", attachment_type=allure.attachment_type.ZIP)
     current_page.close()
+    context.close()
+    if video:
+        allure.attach.file(video.path(), name="video.webm", attachment_type=allure.attachment_type.WEBM)
 
 
 @pytest.hookimpl(hookwrapper=True)

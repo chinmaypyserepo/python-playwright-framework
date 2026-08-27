@@ -3,9 +3,9 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "automationintesting-playwright"
+name = "pyplaywrightframework"
 version = "1.0.0"
-description = "Interview-ready Python Playwright automation framework"
+description = "Python Playwright automation framework"
 requires-python = ">=3.10"
 dependencies = [
     "playwright>=1.48,<2",
@@ -22,7 +22,7 @@ dependencies = [
 dev = ["ruff>=0.6,<1", "pytest-cov>=5,<6"]
 
 [tool.setuptools]
-packages = ["config", "framework", "pages", "tests"]
+packages = ["config", "test_framework", "pages", "tests"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

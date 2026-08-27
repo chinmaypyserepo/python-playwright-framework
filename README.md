@@ -1,4 +1,4 @@
-# Automation in Testing - Python Playwright Framework
+# PyPlaywrightFramework
 
 An interview-ready example framework for [automationintesting.online](https://automationintesting.online/) using Python, Pytest, Playwright, Page Object Model, API checks, JSON data, Allure, SQLite, and GitHub Actions.
 
@@ -6,30 +6,30 @@ An interview-ready example framework for [automationintesting.online](https://au
 
 ```text
 config/                 typed .env-backed settings
-framework/              API client, retry, logging, SQLite persistence
+test_framework/         API client, retry, logging, SQLite persistence
 pages/                  Page Object Model
 data/                   JSON-driven test data
 tests/                  UI/API, validation, date-picker and dialog tests
-scripts/                PowerShell and bash entry points
+scripts/                Windows batch and bash entry points
 .github/workflows/      Chromium, Firefox and WebKit CI matrix
 ```
 
 ## Setup
 
-```powershell
+```text
 python -m venv .venv
-.venv\Scripts\Activate.ps1
+.venv\Scripts\activate.bat
 pip install .
-Copy-Item .env.example .env
+copy .env.example .env
 playwright install
 ```
 
 Run smoke tests:
 
-```powershell
-.\scripts\run-tests.ps1 -Browser chromium -Markers smoke
-.\scripts\run-tests.ps1 -Browser firefox -Markers smoke
-.\scripts\run-tests.ps1 -Browser webkit -Markers smoke
+```bat
+scripts\run-tests.bat chromium smoke
+scripts\run-tests.bat firefox smoke
+scripts\run-tests.bat webkit smoke
 ```
 
 ```bash
@@ -38,27 +38,28 @@ Run smoke tests:
 
 ## Day-to-day commands
 
-PowerShell is headless by default:
+Windows runs headless by default:
 
-```powershell
-.\scripts\run-tests.ps1 -Browser chromium -Markers smoke
+```bat
+scripts\run-tests.bat chromium smoke
 ```
 
-Run headed to watch the browser:
+To run headed, use this command:
 
-```powershell
-.\scripts\run-tests.ps1 -Browser chromium -Markers smoke -Headed
+```bat
+set HEADLESS=false
+python -m pytest -m smoke --browser chromium
 ```
 
 Direct Pytest commands:
 
-```powershell
+```bat
 # Headless, all tests
-$env:HEADLESS = "true"
+set HEADLESS=true
 python -m pytest --browser chromium --alluredir allure-results
 
 # Headed, one test file
-$env:HEADLESS = "false"
+set HEADLESS=false
 python -m pytest tests/test_ui_home.py --browser chromium -s
 
 # Run by marker
@@ -78,7 +79,7 @@ python -m pytest -m smoke --browser chromium -n 2
 
 Useful diagnostics:
 
-```powershell
+```text
 # Show collection without executing tests
 python -m pytest --collect-only -q
 
@@ -89,7 +90,8 @@ allure serve allure-results
 playwright show-trace test-results/traces/<test-name>.zip
 
 # Remove generated local results
-Remove-Item -Recurse -Force test-results, allure-results -ErrorAction SilentlyContinue
+rmdir /s /q test-results
+rmdir /s /q allure-results
 ```
 
 On Linux/macOS, use the equivalent runner:
@@ -102,7 +104,7 @@ python -m pytest -m ui --browser chromium -s
 
 Run all tests and generate an Allure report:
 
-```powershell
+```bat
 python -m pytest --browser chromium --alluredir allure-results
 allure serve allure-results
 ```

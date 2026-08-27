@@ -4,7 +4,7 @@ from typing import Any
 import requests
 
 from config.settings import settings
-from framework.retry import transient_retry
+from test_framework.retry import transient_retry
 
 logger = logging.getLogger(__name__)
 
@@ -28,4 +28,3 @@ class ApiClient:
 
     def get_room(self, room_id: str) -> dict[str, Any]:
         return self.request("GET", f"/api/room/{room_id}").json()
-

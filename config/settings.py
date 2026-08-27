@@ -16,7 +16,7 @@ def _as_bool(value: str) -> bool:
 class Settings:
     base_url: str = os.getenv("BASE_URL", "https://automationintesting.online").rstrip("/")
     api_url: str = os.getenv("API_URL", os.getenv("BASE_URL", "https://automationintesting.online")).rstrip("/")
-    headless: bool = _as_bool(os.getenv("HEADLESS", "true"))
+    headless: bool = _as_bool(os.getenv("HEADLESS", "false"))
     browser: str = os.getenv("BROWSER", "chromium").lower()
     slow_mo: int = int(os.getenv("SLOW_MO", "0"))
     action_timeout_ms: int = int(os.getenv("ACTION_TIMEOUT_MS", "15000"))
