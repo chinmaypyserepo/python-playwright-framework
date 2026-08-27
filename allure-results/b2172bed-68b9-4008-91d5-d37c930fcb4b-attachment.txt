@@ -1,1 +1,0 @@
-2026-08-27 21:38:44,676 | INFO | framework.api_client | GET https://automationintesting.online/api/room

@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "automationintesting-playwright"
+version = "1.0.0"
+description = "Interview-ready Python Playwright automation framework"
+requires-python = ">=3.10"
+dependencies = [
+    "playwright>=1.48,<2",
+    "pytest>=8.0,<9",
+    "pytest-playwright>=0.5,<1",
+    "pytest-xdist>=3.5,<4",
+    "allure-pytest>=2.13,<3",
+    "requests>=2.32,<3",
+    "python-dotenv>=1.0,<2",
+    "tenacity>=9.0,<10",
+]
+
+[project.optional-dependencies]
+dev = ["ruff>=0.6,<1", "pytest-cov>=5,<6"]
+
+[tool.setuptools]
+packages = ["config", "framework", "pages", "tests"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+    "ui: browser-based end-to-end tests",
+    "api: API contract and workflow tests",
+    "smoke: short critical-path tests",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

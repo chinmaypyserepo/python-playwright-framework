@@ -1,0 +1,10 @@
+{
+  "valid": {
+    "name": "Playwright Interview",
+    "email": "playwright@example.com",
+    "phone": "01234567890",
+    "subject": "Automation enquiry",
+    "message": "This is a deterministic framework smoke test."
+  }
+}
+

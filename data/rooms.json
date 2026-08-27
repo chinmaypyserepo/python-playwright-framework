@@ -1,0 +1,4 @@
+{
+  "expected_room_keys": ["roomid", "roomName", "type", "accessible", "image", "description", "features", "roomPrice"]
+}
+

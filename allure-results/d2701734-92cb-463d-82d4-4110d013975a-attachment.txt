@@ -1,1 +1,0 @@
-INFO     pages.base_page:base_page.py:29 Browser dialog: Playwright handled this alert
