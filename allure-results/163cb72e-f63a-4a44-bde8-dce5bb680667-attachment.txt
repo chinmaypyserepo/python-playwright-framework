@@ -1,0 +1,1 @@
+INFO     framework.api_client:api_client.py:21 GET https://automationintesting.online/api/room
